@@ -1,5 +1,6 @@
 package com.algorithms;
 
+import com.algorithms.counters.ComparisonCounter;
 import com.algorithms.exceptions.DuplicateKeyException;
 
 import java.io.Serial;
@@ -16,8 +17,9 @@ public class BTree implements Serializable {
         root = null;
     }
 
-    public Integer search(int key) {
-        return (root == null) ? null : root.sharSearch(key);
+    public Integer search(int key, ComparisonCounter comparisonCount) {
+        comparisonCount.reset();
+        return (root == null) ? null : root.sharSearch(key, comparisonCount);
     }
 
     public void insert(int key, int position) {
@@ -28,7 +30,7 @@ public class BTree implements Serializable {
             root.numberOfKeys = 1;
         }
         else {
-            if (search(key) != null) {
+            if (search(key, new ComparisonCounter()) != null) {
                 throw new DuplicateKeyException("Key " + key + " already exists in the B-tree.");
             }
             if (root.numberOfKeys == 2 * t - 1) {

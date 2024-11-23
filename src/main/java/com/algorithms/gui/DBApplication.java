@@ -13,6 +13,7 @@ public class DBApplication extends Application {
         Controller controller = fxmlLoader.getController();
         controller.setCloseHandler(stage);
         stage.setTitle("B-Tree Database");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }

@@ -1,5 +1,6 @@
 package com.algorithms;
 
+import com.algorithms.counters.ComparisonCounter;
 import com.algorithms.exceptions.DuplicateKeyException;
 
 import java.io.Serial;
@@ -24,12 +25,13 @@ public class BTreeNode implements Serializable {
         numberOfKeys = 0;
     }
 
-    public Integer sharSearch(int key) {
+    public Integer sharSearch(int key, ComparisonCounter comparisonCount) {
         int actualLength = findActualLength(keys);
         int k = (int) (Math.log(actualLength) / Math.log(2));
         int i = (int) Math.pow(2, k);
         int currentKey = keys[i - 1];
         int delta = -1, l, counter = 0;
+        comparisonCount.increment();
         if (currentKey == key) {
             return positions[i - 1];
         }
@@ -39,6 +41,7 @@ public class BTreeNode implements Serializable {
             while (i > 0 && i <= actualLength) {
                 counter++;
                 currentKey = keys[i - 1];
+                comparisonCount.increment();
                 if (currentKey == keys[actualLength - 1] && key > currentKey) {
                     i += 1;
                     break;
@@ -63,6 +66,7 @@ public class BTreeNode implements Serializable {
             while (i > 0 && i <= actualLength) {
                 counter++;
                 currentKey = keys[i - 1];
+                comparisonCount.increment();
                 if (currentKey == keys[0] && key < currentKey) {
                     break;
                 }
@@ -85,7 +89,7 @@ public class BTreeNode implements Serializable {
         if (isLeaf) {
             return null;
         }
-        return children[i - 1].sharSearch(key);
+        return children[i - 1].sharSearch(key, comparisonCount);
     }
 
     public boolean containsKey(int key) {

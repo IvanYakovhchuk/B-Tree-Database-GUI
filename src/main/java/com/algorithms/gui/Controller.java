@@ -2,6 +2,7 @@ package com.algorithms.gui;
 
 import com.algorithms.BTree;
 import com.algorithms.BTreeNode;
+import com.algorithms.counters.ComparisonCounter;
 import com.algorithms.exceptions.DuplicateKeyException;
 import com.algorithms.save.BTreeUtils;
 import com.algorithms.data.FileAccess;
@@ -12,8 +13,6 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -53,6 +52,8 @@ public class Controller {
         if (bTree == null) {
             bTree = new BTree(25);
         }
+        keyInput.setFont(Font.font("Times New Roman", 20));
+        recordInput.setFont(Font.font("Times New Roman", 20));
     }
     public void setCloseHandler(Stage stage) {
         stage.setOnCloseRequest(event -> {
@@ -73,52 +74,47 @@ public class Controller {
             int key = Integer.parseInt(keyText);
             String record = recordInput.getText();
             bTree.insert(key, (int)FileAccess.writeRecord(dataFile, record));
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Record (" + record + ") added successfully at key " + keyText + "!");
-            messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+            messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
         }
         catch (NumberFormatException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Please, enter a valid key!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
         catch (DuplicateKeyException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Record with key " + keyText + " already exists!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
     }
     @FXML
     private void findRecord() throws IOException {
+        String keyText = "";
         try {
-            String keyText = keyInput.getText();
+            keyText = keyInput.getText();
             int key = Integer.parseInt(keyText);
-            long positionToRead = bTree.search(key);
+            ComparisonCounter comparisonCounter = new ComparisonCounter();
+            long positionToRead = bTree.search(key, comparisonCounter);
             String res = FileAccess.readRecord(dataFile, (int)positionToRead);
             recordInput.setText(res);
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Record found: " + res);
-            messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+            messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Total comparisons");
+            alert.setHeaderText("Comparisons count: ");
+            alert.setContentText(String.format("%d", comparisonCounter.getCount()));
+            alert.showAndWait();
         }
         catch (NullPointerException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
-            messagesOutput.setText("No record with such key found!");
+            messagesOutput.setFont(new Font("System", 40));
+            messagesOutput.setText("No record with key " + keyText + " found!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
         catch (NumberFormatException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Please, enter a valid key!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
@@ -130,20 +126,16 @@ public class Controller {
             Files.delete(Path.of("data.txt"));
         }
         catch (NoSuchFileException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("No file found!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
         Files.deleteIfExists(Path.of("btree.ser"));
         this.bTree = new BTree(25);
         BTreeUtils.saveBTree(bTree, "btree.ser");
-        messagesOutput.setVisible(true);
-        messagesOutput.setWrapText(true);
-        messagesOutput.setFont(new Font("System", 20));
+        messagesOutput.setFont(new Font("System", 40));
         messagesOutput.setText("All data deleted successfully!");
-        messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+        messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
     }
 
     @FXML
@@ -160,11 +152,9 @@ public class Controller {
                 e.printStackTrace();
             }
         }
-        messagesOutput.setVisible(true);
-        messagesOutput.setWrapText(true);
-        messagesOutput.setFont(new Font("System", 20));
+        messagesOutput.setFont(new Font("System", 40));
         messagesOutput.setText("Data generated successfully!");
-        messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+        messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
     }
     private static String generateRandomString(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -184,7 +174,7 @@ public class Controller {
             String newRecord = recordInput.getText();
             keyText = keyInput.getText();
             int key = Integer.parseInt(keyText);
-            long positionToWrite = bTree.search(key);
+            long positionToWrite = bTree.search(key, new ComparisonCounter());
             try (RandomAccessFile file = new RandomAccessFile(dataFile, "rw")) {
                 file.seek(positionToWrite);
                 String oldRecord = file.readLine();
@@ -208,24 +198,18 @@ public class Controller {
 
                 file.writeBytes("\n");
                 recordInput.setText(newRecord);
-                messagesOutput.setVisible(true);
-                messagesOutput.setWrapText(true);
-                messagesOutput.setFont(new Font("System", 12));
+                messagesOutput.setFont(new Font("System", 25));
                 messagesOutput.setText("Record (" + oldRecord + ") has been edited successfully! Now this record is (" + newRecord + ")");
-                messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+                messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
             }
         }
         catch (NullPointerException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("No record with key " + keyText + " found!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
         catch (NumberFormatException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Please, enter a valid key!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
@@ -237,7 +221,7 @@ public class Controller {
         try {
             keyText = keyInput.getText();
             int key = Integer.parseInt(keyText);
-            long positionToWrite = bTree.search(key);
+            long positionToWrite = bTree.search(key, new ComparisonCounter());
 
             try (RandomAccessFile file = new RandomAccessFile(dataFile, "rw")) {
                 file.seek(positionToWrite);
@@ -264,24 +248,18 @@ public class Controller {
                 bTree.remove(key);
                 bTree.updatePositionsInBTree(positionToWrite, -lengthOfDeletedRecord);
 
-                messagesOutput.setVisible(true);
-                messagesOutput.setWrapText(true);
-                messagesOutput.setFont(new Font("System", 20));
+                messagesOutput.setFont(new Font("System", 40));
                 messagesOutput.setText("Record with key " + key + " has been deleted successfully.");
-                messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+                messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
             }
         }
         catch (NullPointerException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("No record with key " + keyText + " found!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
         catch (NumberFormatException e) {
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("Please, enter a valid key!");
             messagesOutput.setTextFill(Paint.valueOf("RED"));
         }
@@ -295,11 +273,9 @@ public class Controller {
                 showInOrder(bTree.root, sb, file);
             }
             recordInput.setText(sb.toString());
-            messagesOutput.setVisible(true);
-            messagesOutput.setWrapText(true);
-            messagesOutput.setFont(new Font("System", 20));
+            messagesOutput.setFont(new Font("System", 40));
             messagesOutput.setText("All data is now on the screen!");
-            messagesOutput.setTextFill(Paint.valueOf("GREEN"));
+            messagesOutput.setTextFill(Paint.valueOf("LIMEGREEN"));
         }
     }
 
@@ -310,7 +286,7 @@ public class Controller {
                     showInOrder(node.children[i], sb, file);
                 }
 
-                sb.append("Key ").append(node.keys[i] + ": ").append(FileAccess.readRecord(dataFile, node.positions[i])).append("\n");
+                sb.append("Key ").append(node.keys[i] + ":   ").append(FileAccess.readRecord(dataFile, node.positions[i])).append("\n");
             }
 
             if (!node.isLeaf) {
