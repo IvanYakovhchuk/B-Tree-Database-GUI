@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.algorithms.gui.Controller">
+   <children>
+      <Button fx:id="addButton" layoutX="74.0" layoutY="335.0" mnemonicParsing="false" onAction="#addRecord" prefHeight="34.0" prefWidth="76.0" text="Add">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="findButton" layoutX="207.0" layoutY="335.0" mnemonicParsing="false" onAction="#findRecord" prefHeight="34.0" prefWidth="76.0" text="Find">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="editButton" layoutX="333.0" layoutY="335.0" mnemonicParsing="false" onAction="#editRecord" prefHeight="34.0" prefWidth="76.0" text="Edit">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="deleteButton" layoutX="455.0" layoutY="335.0" mnemonicParsing="false" onAction="#deleteRecord" prefHeight="34.0" prefWidth="76.0" text="Delete">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Label layoutX="165.0" layoutY="84.0" />
+      <TextField fx:id="keyInput" layoutX="100.0" layoutY="71.0" prefHeight="24.0" prefWidth="76.0" />
+      <TextArea fx:id="recordInput" layoutX="100.0" layoutY="125.0" prefHeight="165.0" prefWidth="247.0" />
+      <Label layoutX="15.0" layoutY="69.0" text="Key:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="15.0" layoutY="125.0" text="Record:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <MenuBar layoutY="1.0" prefHeight="25.0" prefWidth="600.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="randomRecordsItem" mnemonicParsing="false" onAction="#generateRecords" text="Generate 10000 random records" />
+                  <MenuItem fx:id="allRecordsItem" mnemonicParsing="false" onAction="#showAllRecords" text="Show all records" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem fx:id="deleteAllDataItem" mnemonicParsing="false" onAction="#deleteAllData" text=" Delete all" />
+                  <MenuItem fx:id="clearInputItem" mnemonicParsing="false" onAction="#clearInput" text="Clear input screens" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <Label layoutX="427.0" layoutY="69.0" prefHeight="30.0" prefWidth="94.0" text="Messages:" textAlignment="CENTER">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="messagesOutput" layoutX="376.0" layoutY="116.0" prefHeight="180.0" prefWidth="195.0" text="Label" textFill="RED" visible="false">
+         <font>
+            <Font name="System Italic" size="20.0" />
+         </font></Label>
+   </children>
+</AnchorPane>
